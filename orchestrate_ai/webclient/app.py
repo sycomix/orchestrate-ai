@@ -10,7 +10,7 @@ app.secret_key = 'orchestrate-ai'
 
 app.config['UPLOAD_FOLDER_MIDI'] = '_uploads/midi/'
 app.config['UPLOAD_FOLDER_LYRICS'] = '_uploads/lyrics/'
-app.config['ALLOWED_EXTENSIONS'] = set(['mid', 'txt'])
+app.config['ALLOWED_EXTENSIONS'] = {'mid', 'txt'}
 
 @app.route('/')
 def index():
@@ -74,8 +74,7 @@ def allowed_file(filename, extension_set = app.config['ALLOWED_EXTENSIONS']):
 
 def dated_url_for(endpoint, **values):
     if endpoint == 'static':
-        filename = values.get('filename', None)
-        if filename:
+        if filename := values.get('filename', None):
             file_path = os.path.join(app.root_path,
                                      endpoint, filename)
             values['q'] = int(os.stat(file_path).st_mtime)

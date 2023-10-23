@@ -27,9 +27,9 @@ class Generator:
 		instrument_playlist_items = self.get_video_list_for_instrument(instrument_name, force_refresh)
 		emotion_playlist_items = self.get_video_list_for_emotion(emotion_label, force_refresh)
 
-		video_list = list(set(instrument_playlist_items).intersection(emotion_playlist_items))
-
-		return video_list
+		return list(
+			set(instrument_playlist_items).intersection(emotion_playlist_items)
+		)
 
 	"""Returns a video list for given instrument
 
@@ -56,7 +56,7 @@ class Generator:
 
 		if emotion_label is None:
 			# When no emotional label is provided it fetches all emotional lables from playlist
-			emotion_labels = [(emotion) for emotion in self.json_data["emotions"]]
+			emotion_labels = list(self.json_data["emotions"])
 		else:
 			emotion_labels = [emotion_label]
 
@@ -83,11 +83,8 @@ class Generator:
 	"""
 	def get_cached_playlist_items(self, playlist_id):
 		try:
-			data_file = open(self.cache_filename,"r")
-
-			cached_json_data = json.load(data_file)
-
-			data_file.close()
+			with open(self.cache_filename,"r") as data_file:
+				cached_json_data = json.load(data_file)
 
 			return cached_json_data[playlist_id], (cached_json_data[playlist_id] != None)
 		except:
@@ -103,11 +100,9 @@ class Generator:
 	"""
 	def cache_playlist_items(self, playlist_id, playlist_items):
 		try:
-			data_file = open(self.cache_filename,"r")
+			with open(self.cache_filename,"r") as data_file:
+				cached_json_data = json.load(data_file)
 
-			cached_json_data = json.load(data_file)
-
-			data_file.close()
 		except:
 			cached_json_data = {}
 

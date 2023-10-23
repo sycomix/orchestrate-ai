@@ -10,13 +10,12 @@ def midiToNoteStateMatrix(midifile, squash=True, span=span):
 
     timeleft = [track[0].tick for track in pattern]
 
-    posns = [0 for track in pattern]
+    posns = [0 for _ in pattern]
 
-    statematrix = []
     time = 0
 
-    state = [[0,0] for x in range(span)]
-    statematrix.append(state)
+    state = [[0,0] for _ in range(span)]
+    statematrix = [state]
     condition = True
     while condition:
         if time % (pattern.resolution / 4) == (pattern.resolution / 8):
@@ -33,10 +32,7 @@ def midiToNoteStateMatrix(midifile, squash=True, span=span):
 
                 evt = track[pos]
                 if isinstance(evt, midi.NoteEvent):
-                    if (evt.pitch < lowerBound) or (evt.pitch >= upperBound):
-                        pass
-                        # print "Note {} at time {} out of bounds (ignoring)".format(evt.pitch, time)
-                    else:
+                    if evt.pitch >= lowerBound and evt.pitch < upperBound:
                         if isinstance(evt, midi.NoteOffEvent) or evt.velocity == 0:
                             state[evt.pitch-lowerBound] = [0, 0]
                         else:
@@ -69,18 +65,18 @@ def midiToNoteStateMatrix(midifile, squash=True, span=span):
 
 def noteStateMatrixToMidi(statematrix, name="example", span=span):
     statematrix = np.array(statematrix)
-    if not len(statematrix.shape) == 3:
+    if len(statematrix.shape) != 3:
         statematrix = np.dstack((statematrix[:, :span], statematrix[:, span:]))
     statematrix = np.asarray(statematrix)
     pattern = midi.Pattern()
     track = midi.Track()
     pattern.append(track)
-    
+
     span = upperBound-lowerBound
     tickscale = 55
-    
+
     lastcmdtime = 0
-    prevstate = [[0,0] for x in range(span)]
+    prevstate = [[0,0] for _ in range(span)]
     for time, state in enumerate(statematrix + [prevstate[:]]):  
         offNotes = []
         onNotes = []
@@ -101,10 +97,10 @@ def noteStateMatrixToMidi(statematrix, name="example", span=span):
         for note in onNotes:
             track.append(midi.NoteOnEvent(tick=(time-lastcmdtime)*tickscale, velocity=40, pitch=note+lowerBound))
             lastcmdtime = time
-            
+
         prevstate = state
-    
+
     eot = midi.EndOfTrackEvent(tick=1)
     track.append(eot)
 
-    midi.write_midifile("{}.mid".format(name), pattern)
+    midi.write_midifile(f"{name}.mid", pattern)

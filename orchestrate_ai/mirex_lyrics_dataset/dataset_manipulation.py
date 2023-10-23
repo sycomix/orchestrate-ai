@@ -102,9 +102,8 @@ Returns the parsed lexicon pickle
 def parse_lexicon_pickle():
 	if not os.path.isfile(LEXICON_PICKLE_FILE):
 		return create_lexicon(get_moods())
-	else:
-		with open(LEXICON_PICKLE_FILE,"r") as file:
-			return pickle.load(file)
+	with open(LEXICON_PICKLE_FILE,"r") as file:
+		return pickle.load(file)
 
 """ Generates training and testing dataset
 

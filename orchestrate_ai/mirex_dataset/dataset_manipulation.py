@@ -82,7 +82,7 @@ def get_moods():
 Returns numpy array of songs converted to state matrix
 """
 def get_songs(path):
-    files = glob.glob('{}/*.mid*'.format(path))
+    files = glob.glob(f'{path}/*.mid*')
     songs = []
     for f in tqdm(files):
         try:
@@ -90,7 +90,7 @@ def get_songs(path):
             if np.array(song).shape[0] > SONG_SLICE_START + SONG_SLICE_COUNT:
                 songs.append(slice_song(song))
         except Exception as e:
-            raise e           
+            raise e
     return songs
 
 """ Slices song for uniform song length

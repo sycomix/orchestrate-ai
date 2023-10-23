@@ -31,21 +31,20 @@ class Client:
 
 			print("Fetched ", len(json_response['items']), " items on page ", page, "out of ", total_pages, " pages")
 
-			for item in json_response["items"]:
-				item_ids.append(item["contentDetails"]["videoId"])
-
+			item_ids.extend(
+				item["contentDetails"]["videoId"] for item in json_response["items"]
+			)
 			if total_results <= len(item_ids):
 				break
-			else:
-				page += 1
-				next_page_token = json_response["nextPageToken"]
+			page += 1
+			next_page_token = json_response["nextPageToken"]
 
 		return item_ids
 
 	def get_playlist_items_api_url(self, playlist_id, next_page_token = None):
-		url = "https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails&maxResults=50&playlistId="+ playlist_id +"&key=" + self.api_key
+		url = f"https://www.googleapis.com/youtube/v3/playlistItems?part=contentDetails&maxResults=50&playlistId={playlist_id}&key={self.api_key}"
 
 		if next_page_token is not None:
-			url = url + "&pageToken=" + next_page_token
+			url = f"{url}&pageToken={next_page_token}"
 
 		return url

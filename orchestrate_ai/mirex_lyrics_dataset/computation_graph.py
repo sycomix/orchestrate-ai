@@ -65,7 +65,7 @@ def predict_lyrics(lyrics_feed):
 		saver = tf.train.Saver()
 		with tf.Session() as sess:
 			
-			if(len(glob.glob(GRAPH_SAVE_FILE + "*")) > 0):
+			if glob.glob(f"{GRAPH_SAVE_FILE}*"):
 				save_path = saver.restore(sess, GRAPH_SAVE_FILE)
 			else:
 				train_lyrics()
